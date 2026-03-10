@@ -5,6 +5,9 @@ import subprocess
 from datetime import datetime
 from ics import Calendar, Event as ICSEvent
 import os
+import pytz
+
+central = pytz.timezone("America/Chicago")
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
@@ -25,8 +28,8 @@ class Event():
         self.event_id       = data["EventId"]
         self.facility_name  = data["FacilityName"]
         self.account_name   = data["AccountName"]
-        self.start_time = datetime.fromisoformat(data["EventStartTime"])
-        self.end_time       = datetime.fromisoformat(data["EventEndTime"])
+        self.start_time     = central.localize(datetime.fromisoformat(data["EventStartTime"]))
+        self.end_time       = central.localize(datetime.fromisoformat(data["EventEndTime"]))
         self.event_type     = data["EventTypeName"]
 
 facility_locations = {
