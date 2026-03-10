@@ -11,15 +11,15 @@ headers = {
 }
 
 response = requests.get("https://starcenter.finnlyconnect.com/registration/activityitem/21100", headers=headers)
-response2 = requests.get("https://starcenter.finnlyconnect.com/registration/activityitem/20619", headers=headers)
+#response2 = requests.get("https://starcenter.finnlyconnect.com/registration/activityitem/20619", headers=headers)
 
-if response.status_code != 200 and response2.status_code != 200:
+if response.status_code != 200:
     print(f"Site is down (status {response.status_code}), skipping this run.")
     exit()
 
 print("Status code:", response.status_code)
 
-html = response.text + response2.text
+html = response.text #+ response2.text
 
 class Event():
 
