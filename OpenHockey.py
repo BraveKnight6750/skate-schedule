@@ -1,7 +1,6 @@
 import requests
 import re
 import json
-import subprocess
 from datetime import datetime
 from ics import Calendar, Event as ICSEvent
 import os
@@ -10,16 +9,10 @@ headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 }
 
-response = requests.get("https://starcenter.finnlyconnect.com/registration/activityitem/21100", headers=headers)
-#response2 = requests.get("https://starcenter.finnlyconnect.com/registration/activityitem/20619", headers=headers)
-
-if response.status_code != 200:
-    print(f"Site is down (status {response.status_code}), skipping this run.")
-    exit()
-
-print("Status code:", response.status_code)
-
-html = response.text #+ response2.text
+URLS = [
+    "https://starcenter.finnlyconnect.com/registration/activityitem/21100",
+    "https://starcenter.finnlyconnect.com/registration/activityitem/20619",
+]
 
 class Event():
 
@@ -48,6 +41,14 @@ allowed_facilities= {
     "MK - North Rink"
 }
 
+def parse_events_from_html(html: str) -> list:
+    pattern = r'singleSessionSchedule.*?"Data":\s*(\[.*?\])\s*,\s*"Total":\s*\d+'
+    match = re.search(pattern, html, re.DOTALL)
+    if not match:
+        return []
+    schedule_list = json.loads(match.group(1))
+    return [Event(e) for e in schedule_list if e["DisplayFacility"] in allowed_facilities]
+
 def build_ics(events: list[Event], output_file="open_hockey.ics"):
     cal = Calendar()
 
@@ -66,21 +67,28 @@ def build_ics(events: list[Event], output_file="open_hockey.ics"):
     print(f"Saved {len(events)} events to {output_file}")
 
 #main
-pattern = r'singleSessionSchedule.*?"Data":\s*(\[.*?\])\s*,\s*"Total":\s*\d+'
-match = re.search(pattern, html, re.DOTALL) 
+all_events = []
+any_success = False
 
-if not match:
-       print("No events")
-       exit() 
-    
-schedule_list = json.loads(match.group(1))
+for url in URLS:
+    response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+        print(f"Failed to fetch {url} (status {response.status_code}), skipping.")
+        continue
+    any_success = True
+    events = parse_events_from_html(response.text)
+    print(f"Found {len(events)} events from {url}")
+    all_events.extend(events)
 
-events = [Event(e) for e in schedule_list if e["DisplayFacility"] in allowed_facilities]
-
-if not events:
-    print("No matching events found for allowed facilities")
+if not any_success:
+    print("All URLs failed, exiting.")
     exit()
-build_ics(events)
+
+if not all_events:
+    print("No matching events found for allowed facilities.")
+    exit()
+
+build_ics(all_events)
 
 from github import Github, Auth
 
