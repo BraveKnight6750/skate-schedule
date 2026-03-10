@@ -4,6 +4,7 @@ import json
 from datetime import datetime
 from ics import Calendar, Event as ICSEvent
 import os
+import pytz
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
@@ -14,13 +15,15 @@ URLS = [
     "https://starcenter.finnlyconnect.com/registration/activityitem/20619",
 ]
 
+central = pytz.timezone("America/Chicago")
+
 class Event():
 
     def __init__(self,data:dict):
         self.event_id       = data["ActivityId"]
         self.facility_name  = data["DisplayFacility"]
-        self.start_time = datetime.fromisoformat(data["Start"])
-        self.end_time       = datetime.fromisoformat(data["End"])
+        self.start_time = central.localize(datetime.fromisoformat(data["Start"]))
+        self.end_time   = central.localize(datetime.fromisoformat(data["End"]))
         self.rinkName = self.facility_name[0:2]
 
 facility_locations = {
