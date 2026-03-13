@@ -24,13 +24,14 @@ class Event():
         self.facility_name  = data["DisplayFacility"]
         self.start_time = central.localize(datetime.fromisoformat(data["Start"]))
         self.end_time   = central.localize(datetime.fromisoformat(data["End"]))
-        self.rinkName = self.facility_name[0:2]
+        self.rinkName = abbreviations.get(self.facility_name, self.facility_name[0:2])
 
 facility_locations = {
     "PL - World Rink": "4020 W Plano Pkwy, Plano, TX 75093",
     "PL - US Rink":    "4020 W Plano Pkwy, Plano, TX 75093",
     "RC - Blue Rink":  "522 Centennial Blvd, Richardson, TX 75081",
     "RC - Red Rink":   "522 Centennial Blvd, Richardson, TX 75081",
+    "Richardson":      "522 Centennial Blvd, Richardson, TX 75081",
     "MK - South Rink": "6993 Stars Ave, McKinney, TX 75070",
     "MK - North Rink": "6993 Stars Ave, McKinney, TX 75070"
 }
@@ -41,7 +42,14 @@ allowed_facilities= {
     "RC - Blue Rink",
     "RC - Red Rink",
     "MK - South Rink",
-    "MK - North Rink"
+    "MK - North Rink",
+    "Richardson"
+}
+
+abbreviations = {
+    "Richardson": "RC",
+    "McKinney": "MK",
+    "Plano": "PL"
 }
 
 def parse_events_from_html(html: str) -> list:
