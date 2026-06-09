@@ -11,8 +11,13 @@ headers = {
 }
 
 URLS = [
+    
+    # mckinney
     "https://starcenter.finnlyconnect.com/registration/activityitem/21100",
+    # richardson
     "https://starcenter.finnlyconnect.com/registration/activityitem/20619",
+    # plano
+    "https://starcenter.finnlyconnect.com/registration/activityitem/23370",
 ]
 
 central = pytz.timezone("America/Chicago")
