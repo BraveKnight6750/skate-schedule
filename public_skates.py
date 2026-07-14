@@ -4,6 +4,10 @@ import re
 from ics import Calendar, Event as ICSEvent
 from datetime import datetime
 
+url = "https://starcenter.finnlyconnect.com/schedule/833"
+
+headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+
 
 class Event:
 
@@ -52,12 +56,6 @@ def build_ics(events: list[Event], output_file="public_skates.ics"):
 
 
 if __name__ == "__main__":
-    url = "https://starcenter.finnlyconnect.com/schedule/833"
-
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-    }
-
     response = requests.get(url, headers=headers)
 
     if response.status_code != 200:
