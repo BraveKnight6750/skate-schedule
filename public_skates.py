@@ -4,18 +4,6 @@ import re
 from ics import Calendar, Event as ICSEvent
 from datetime import datetime
 
-url = "https://starcenter.finnlyconnect.com/schedule/833"
-
-headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
-
-response = requests.get(url, headers=headers)
-
-if response.status_code != 200:
-    print(f"Site is down (status {response.status_code}), skipping this run.")
-    exit()
-
-html = response.text
-
 
 class Event:
 
@@ -64,6 +52,19 @@ def build_ics(events: list[Event], output_file="public_skates.ics"):
 
 
 if __name__ == "__main__":
+    url = "https://starcenter.finnlyconnect.com/schedule/833"
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    }
+
+    response = requests.get(url, headers=headers)
+
+    if response.status_code != 200:
+        print(f"Site is down (status {response.status_code}), skipping this run.")
+        exit()
+
+    html = response.text
     match = re.search(r"_onlineScheduleList\s=\s(\[.*?\]);", html, re.DOTALL)
 
     if not match:
