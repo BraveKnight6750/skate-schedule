@@ -3,10 +3,13 @@ import json
 import re
 from ics import Calendar, Event as ICSEvent
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 url = "https://starcenter.finnlyconnect.com/schedule/833"
 
 headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+
+LOCAL_TZ = ZoneInfo("America/Chicago")
 
 
 class Event:
@@ -15,8 +18,12 @@ class Event:
         self.event_id = data["EventId"]
         self.facility_name = data["FacilityName"]
         self.account_name = data["AccountName"]
-        self.start_time = datetime.fromisoformat(data["EventStartTime"])
-        self.end_time = datetime.fromisoformat(data["EventEndTime"])
+        self.start_time = datetime.fromisoformat(data["EventStartTime"]).replace(
+            tzinfo=LOCAL_TZ
+        )
+        self.end_time = datetime.fromisoformat(data["EventEndTime"]).replace(
+            tzinfo=LOCAL_TZ
+        )
         self.event_type = data["EventTypeName"]
 
 
